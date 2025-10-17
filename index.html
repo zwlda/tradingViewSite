@@ -112,34 +112,6 @@
             overflow: hidden;
         }
         
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 23, 42, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            border-radius: 20px;
-        }
-        
-        .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
         @media (max-width: 576px) {
             .chart-container {
                 min-width: 100%;
@@ -154,9 +126,6 @@
             <button onclick="loadChart()"><i class="fas fa-sync-alt"></i> بارگذاری چارت</button>
         </div>
         <div id="tradingview-chart"></div>
-        <div id="loadingOverlay" class="loading-overlay">
-            <div class="loading-spinner"></div>
-        </div>
     </div>
 
     <script>
@@ -168,8 +137,6 @@
         // تابع برای بارگذاری چارت TradingView
         function loadChart() {
             const symbol = $('#symbolInput').val().toUpperCase();
-            const loadingOverlay = $('#loadingOverlay');
-            loadingOverlay.show();
             
             // پاک کردن چارت قبلی اگر وجود داشته باشد
             $('#tradingview-chart').empty();
@@ -178,10 +145,10 @@
                 "autosize": true,
                 "symbol": `BINANCE:${symbol}`,
                 "interval": "60",
-                "timezone": "Etc/UTC",
+                "timezone": "Asia/Tehran",
                 "theme": "dark",
                 "style": "1",
-                "locale": "en",
+                "locale": "fa_IR",
                 "toolbar_bg": "#0f172a",
                 "enable_publishing": false,
                 "hide_top_toolbar": false,
@@ -194,10 +161,7 @@
                     "paneProperties.vertGridProperties.color": "rgba(30, 41, 59, 0.5)",
                     "paneProperties.horzGridProperties.color": "rgba(30, 41, 59, 0.5)",
                     "symbolWatermarkProperties.transparency": 90,
-                    "scalesProperties.textColor": "#94a3b8",
-                },
-                "onChartReady": function() {
-                    loadingOverlay.hide();
+                    "scalesProperties.textColor": "#94a3b8"
                 }
             });
         }
