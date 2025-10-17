@@ -1,10 +1,9 @@
-<xaiArtifact artifact_id="494d3dfd-4e80-4e5e-a391-994d66731add" artifact_version_id="c73fb968-ded6-444c-ac96-cb0d82cbea52" title="index.html" contentType="text/html">
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ماشین حساب ارز دیجیتال | MobinVh</title>
+    <title>چارت ارز دیجیتال</title>
     <link href="https://fonts.googleapis.com/css2?family=Vaziran:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -62,6 +61,7 @@
             flex-direction: column;
             max-width: 1400px;
             margin: 0 auto;
+            position: relative;
         }
         
         .chart-header {
@@ -112,6 +112,34 @@
             overflow: hidden;
         }
         
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 20px;
+        }
+        
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         @media (max-width: 576px) {
             .chart-container {
                 min-width: 100%;
@@ -126,6 +154,9 @@
             <button onclick="loadChart()"><i class="fas fa-sync-alt"></i> بارگذاری چارت</button>
         </div>
         <div id="tradingview-chart"></div>
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-spinner"></div>
+        </div>
     </div>
 
     <script>
@@ -137,6 +168,11 @@
         // تابع برای بارگذاری چارت TradingView
         function loadChart() {
             const symbol = $('#symbolInput').val().toUpperCase();
+            const loadingOverlay = $('#loadingOverlay');
+            loadingOverlay.show();
+            
+            // پاک کردن چارت قبلی اگر وجود داشته باشد
+            $('#tradingview-chart').empty();
             
             new TradingView.widget({
                 "autosize": true,
@@ -159,6 +195,9 @@
                     "paneProperties.horzGridProperties.color": "rgba(30, 41, 59, 0.5)",
                     "symbolWatermarkProperties.transparency": 90,
                     "scalesProperties.textColor": "#94a3b8",
+                },
+                "onChartReady": function() {
+                    loadingOverlay.hide();
                 }
             });
         }
@@ -172,4 +211,3 @@
     </script>
 </body>
 </html>
-</xaiArtifact>
