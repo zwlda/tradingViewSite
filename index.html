@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingView Chart with Search</title>
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script> <!-- اگر نیاز باشه، اما اصلی charting_library -->
+    <script src="https://unpkg.com/tradingview/charting_library/charting_library.standalone.js"></script> <!-- CDN برای charting library -->
+    <style>
+        body { margin: 0; background: #808080; color: #B8860B; font-family: Arial; }
+        #container { width: 100vw; height: 100vh; } /* Responsive for mobile/desktop */
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <script>
+        const worker = new Worker('worker.js');
+        worker.onmessage = (e) => {
+            if (e.data.type === 'datafeedReady') {
+                const widget = new TradingView.widget({
+                    container: 'container',
+                    symbol: 'BTCUSD',
+                    interval: 'D',
+                    timezone: 'Etc/UTC',
+                    theme: 'dark', // پایه برای خاکستری
+                    locale: 'en',
+                    library_path: 'https://unpkg.com/tradingview/charting_library/',
+                    datafeed: {
+                        // Proxy calls to worker
+                        onReady: (cb) => worker.postMessage({ method: 'onReady', cbId: Math.random() }),
+                        searchSymbols: (userInput, exchange, symbolType, onResult) => worker.postMessage({ method: 'searchSymbols', args: [userInput, exchange, symbolType] }),
+                        resolveSymbol: (symbolName, onResolve, onError) => worker.postMessage({ method: 'resolveSymbol', args: [symbolName] }),
+                        getBars: (symbolInfo, resolution, periodParams, onResult, onError) => worker.postMessage({ method: 'getBars', args: [symbolInfo, resolution, periodParams] }),
+                        subscribeBars: (symbolInfo, resolution, onTick, listenerGuid, onResetCacheNeeded) => worker.postMessage({ method: 'subscribeBars', args: [symbolInfo, resolution, listenerGuid] }),
+                        unsubscribeBars: (listenerGuid) => worker.postMessage({ method: 'unsubscribeBars', args: [listenerGuid] }),
+                    },
+                    disabled_features: [],
+                    enabled_features: ['show_symbol_logos', 'show_exchange_logos', 'show_spread_operators'],
+                    overrides: {
+                        'paneProperties.background': '#808080', // خاکستری
+                        'paneProperties.vertGridProperties.color': '#B8860B', // طلایی مات
+                        'paneProperties.horzGridProperties.color': '#B8860B',
+                        'scalesProperties.textColor': '#B8860B',
+                        'mainSeriesProperties.candleStyle.upColor': '#26a69a',
+                        'mainSeriesProperties.candleStyle.downColor': '#ef5350',
+                        // بیشتر customization برای مدرن بودن
+                    },
+                    symbol_search_request_delay: 500, // بهینه برای جستجو
+                });
+            }
+        };
+        worker.postMessage({ type: 'init' });
+    </script>
+</body>
+</html>
